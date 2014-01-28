@@ -2,35 +2,44 @@
 using System.Collections;
 
 public class PaddleScript : MonoBehaviour {
+	int lives = 4;
 
-	public float paddleSpeed;
+	public float paddleSpeed = 15f;
+
+	public GameObject ballPrefab;
+	GUIText guiLives;
+	GameObject attachedBall = null;
 	// Use this for initialization
 	void Start () {
-	
+		guiLives = GameObject.Find("GUILives").GetComponent<GUIText>();
+		SpawnBall ();
 	}
-	
+
+	public void SpawnBall(){
+		if (ballPrefab == null) {
+			Debug.Log("Did not add ballPrefab");
+			return;
+		}
+		attachedBall = (GameObject)Instantiate( ballPrefab, transform.position + new Vector3(0,.75f,0), Quaternion.identity);
+		lives--;
+
+		GUIText guiLives = GameObject.Find("GUILives").GetComponent<GUIText>();
+	//	if(guiLives)
+			guiLives.text = "Lives: " + lives;
+	}
 	// Update is called once per frame
 	void Update () {
-
-		//	if the input (in this case your arrow key) is left ( < 0)
-		//	then move the paddle to the left
-		//	if( Input.GetAxis( "Horizontal") < 0 ){
-		//		Debug.Log("going left");
-		//		//move the paddle to the left
-		//		//-10f means to the left, you multiply it by deltaTime
-		//		//so it responds uniformly accross computer speeds.
-		//		transform.Translate(-10f * Time.deltaTime, 0, 0);
-		//	}
-		//	same thing but to the right
-		//	if( Input.GetAxis( "Horizontal") > 0 ){
-		//		Debug.Log("going RIGHT");
-		//		transform.Translate(10f * Time.deltaTime, 0, 0);
-		//	}
-
 		//does everything the above does in one line.
 		transform.Translate(paddleSpeed * Time.deltaTime * Input.GetAxis( "Horizontal"), 0, 0);
-
-		//Debug.log() to get message to console!!
+		if (attachedBall) {
+			Rigidbody ballRidgidBody = attachedBall.rigidbody;
+			ballRidgidBody.position = transform.position + new Vector3(0, .75f, 0);
+			if(Input.GetButtonDown ("LaunchBall")){
+				attachedBall.rigidbody.isKinematic = false;
+				attachedBall.rigidbody.AddForce(300f * Input.GetAxis( "Horizontal"),300f,0);
+				attachedBall = null;
+			}
+		}
 	}
 	void OnCollisionEnter( Collision col ) {
 		foreach (ContactPoint contact in col.contacts) {
