@@ -7,7 +7,13 @@ public class PaddleScript : MonoBehaviour {
 	public float paddleSpeed = 15f;
 
 	public GameObject ballPrefab;
+
+	int score = 0;
+
 	GUIText guiLives;
+
+	public GUISkin scoreboardSkin;
+
 	GameObject attachedBall = null;
 	// Use this for initialization
 	void Start () {
@@ -15,6 +21,14 @@ public class PaddleScript : MonoBehaviour {
 		SpawnBall ();
 	}
 
+	public void AddPoint(int value) {
+		score += value;
+	}
+
+	void OnGUI() {
+		GUI.skin = scoreboardSkin;
+		GUI.Label ( new Rect(0,10,100,100), "Score: "+ score);	
+	}
 	public void SpawnBall(){
 		if (ballPrefab == null) {
 			Debug.Log("Did not add ballPrefab");
@@ -31,6 +45,15 @@ public class PaddleScript : MonoBehaviour {
 	void Update () {
 		//does everything the above does in one line.
 		transform.Translate(paddleSpeed * Time.deltaTime * Input.GetAxis( "Horizontal"), 0, 0);
+
+		if (transform.position.x > 7.4) {
+			transform.position = new Vector3(7.4f, transform.position.y, transform.position.z);		
+		}
+
+		if (transform.position.x < -7.4) {
+			transform.position = new Vector3(-7.4f, transform.position.y, transform.position.z);		
+		}
+
 		if (attachedBall) {
 			Rigidbody ballRidgidBody = attachedBall.rigidbody;
 			ballRidgidBody.position = transform.position + new Vector3(0, .75f, 0);

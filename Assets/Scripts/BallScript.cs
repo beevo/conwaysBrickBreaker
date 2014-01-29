@@ -18,7 +18,6 @@ public class BallScript : MonoBehaviour {
 		foreach (ContactPoint contact in col.contacts) {
 			if((float)(Math.Round((double)(contact.point.y),2)) == (float)Math.Round((double)(transform.position.y),2)){
 				Debug.Log("ALL IS LOST!");
-				float english = contact.point.y - transform.position.y;
 				contact.thisCollider.rigidbody.AddForce(0, -300f,0);
 				//Debug.Log(contact.thisCollider.rigidbody.AddForce(300f, 0, 0));
 				//Debug.Log(contact.ToString);
