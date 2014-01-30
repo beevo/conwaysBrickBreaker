@@ -1,12 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
-
-
-struct Point
-{
-	public float x, y;
-}
-
+using System.Collections;
+using System.Collections.Generic;
 
 public class BrickScript : MonoBehaviour {
 	static Vector3[,] lifeArray = new Vector3[16,19];
@@ -27,16 +22,7 @@ public class BrickScript : MonoBehaviour {
 		return 1;
 	}
 
-
 	void OnCollisionEnter( Collision col ) {
-		Destroy( gameObject );
-		GameObject.Find ("paddle").GetComponent<PaddleScript> ().AddPoint (1);
-		numBricks--;
-		Debug.Log (numBricks);
-		if (numBricks <= 0) {
-			Debug.Log("NO MORE BRICKS!");
-			//	Application.LoadLevel("scene 2");
-		}
-
+		GameObject.Find("BrickManager").GetComponent<BrickManagerScript>().renderNextGeneration();
 	}
 }
