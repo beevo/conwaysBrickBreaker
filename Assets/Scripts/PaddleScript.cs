@@ -19,6 +19,8 @@ public class PaddleScript : MonoBehaviour {
 	void Start () {
 		guiLives = GameObject.Find("GUILives").GetComponent<GUIText>();
 		SpawnBall ();
+
+
 	}
 
 	public void AddPoint(int value) {
