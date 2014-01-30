@@ -5,8 +5,6 @@ using System;
 using System.Linq;
 public class BrickManagerScript : MonoBehaviour {
 	public Transform newBrick;
-	static int[,] lifeArray = new int[16,19]; 
-
 	//list of Vectors of bricks to destroy
 	public List<int> destroyBricks = new List<int>();
 	
@@ -16,7 +14,7 @@ public class BrickManagerScript : MonoBehaviour {
 	//list of Vectors of current bricks
 	public List<Vector3> currentBricks = new List<Vector3>();
 
-	int getNumNeighbors(int x, int y){
+	int getNumNeighbors(int x, int y, int[,] lifeArray){
 		int num = 0;
 		//if the slides are being looked at, return 0 for simplicity sake
 		if (x == 0 || y == 0 || x == 15 || y == 18)
@@ -49,24 +47,27 @@ public class BrickManagerScript : MonoBehaviour {
 		GameObject[] bricks = GameObject.FindGameObjectsWithTag("Brick");
 		//kill all bricks in destroyBricks Array
 		foreach (int i in destroyBricks) {
-			Destroy(bricks[i]);		
+			bricks[i].active = false;
+			Destroy(bricks[i]);	
+
 		}
+		destroyBricks.Clear();
 
 		//create new bricks in createBricksArray
 		foreach (Vector3 position in createBricks) {
 			Instantiate(newBrick, position, transform.rotation);		
 		}
-
+		createBricks.Clear ();
 		//calculate next gen
 		calculateNextGeneration ();
 	}
 	private void calculateNextGeneration(){
 		GameObject[] bricks = GameObject.FindGameObjectsWithTag("Brick");
-		
+		int[,] lifeArray = new int[16,19]; 
 		//add all of the current location of the bricks here.
+		Debug.Log ("number of bricks: " + bricks.Length);
 		foreach(GameObject brick in bricks){
 			lifeArray[Mathf.Abs(9-(int)brick.transform.position.y), Mathf.Abs(9+(int)brick.transform.position.x)] = 1;
-			currentBricks.Add(brick.transform.position);
 		}
 		
 		int[,] temp = new int[16,19];
@@ -74,23 +75,24 @@ public class BrickManagerScript : MonoBehaviour {
 		for (int i = 0; i < lifeArray.GetLength(0); i++)
 		{	string row = "";
 			for (int j = 0; j < lifeArray.GetLength(1); j++)
-			{	int neighbors = getNumNeighbors(i,j);
+			{	int neighbors = getNumNeighbors(i,j,lifeArray);
 				row += lifeArray[i,j];
 				if(neighbors == 3 && lifeArray[i,j] == 0){
 					createBricks.Add(new Vector3(j-9,9-i,0));
-					//Debug.Log("create Brick at: "+new Vector3(j-9,9-i,0));
-					temp[i,j] = 1;
 				}else if(neighbors < 2 || neighbors > 3){
 					if(lifeArray[i,j] == 1){
 						int index = Array.FindIndex(bricks, x => x.transform.position == new Vector3(j-9,9-i,0));
 						destroyBricks.Add(index);
-						Debug.Log("destroy index here: "+Array.FindIndex(bricks, x => x.transform.position == new Vector3(j-9,9-i,0)));
+					//	Debug.Log("destroy index here: "+Array.FindIndex(bricks, x => x.transform.position == new Vector3(j-9,9-i,0)));
 					}
+				}else if(neighbors == 2 || (neighbors == 3 && lifeArray[i,j] == 1)){
+					temp[i,j] = 1;
 				}
 			}
 			print += row + "\n"; 
 		}
-		lifeArray = temp;
+		//lifeArray = temp;
+		Debug.LogWarning(destroyBricks.Count);
 	}
 
 	// Use this for initialization
